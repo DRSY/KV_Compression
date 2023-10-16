@@ -60,9 +60,6 @@ from transformers.utils import check_min_version, get_full_repo_name, send_examp
 from transformers.utils.versions import require_version
 from copy import deepcopy
 from tensorboardX import SummaryWriter
-from check import check_CausalLM, check_icl
-# from datasets import set_caching_enabled
-# set_caching_enabled(False)
 
 # Will error if the minimal version of Transformers is not installed. Remove at your own risks.
 check_min_version("4.27.0")
@@ -276,94 +273,13 @@ def parse_args():
         assert args.output_dir is not None, "Need an `output_dir` to create a repo when `--push_to_hub` is passed."
 
     return args
-
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
-import smtplib
-# 导入smplip
-from email.mime.text import MIMEText
-from email.header import Header
-from email.utils import formataddr
-from email.mime.multipart import MIMEMultipart
  
- 
-class sendEmail:
-    def __init__(self, recipient: str, sender: str = "XXX@163.com", password: str = "ZZZZZZZZZ",
-                 serverAddress: str = 'smtp.163.com'):
-        """
-            recipient: 接收者邮箱
-            sender:    发送者邮箱
-            password:  发送者授权码
-            serverAddress: 服务器地址
-        """
-        self.sender = sender  # 发送者邮箱
-        self.password = password  # 授权码
-        self.recipient = recipient  # 接收者邮箱
-        self.serverAddress = serverAddress  # 服务器地址
- 
-    @staticmethod
-    def message(title: str, text: str, sender: str, recipient: str, types: str = "plain", name: str = None,
-                file: str = None):
-        """
-            title:  邮件标题
-            text:   邮件正文
-            types:  文本格式 plain(纯文本)/html(html代码)
-            sender:   发送者邮箱
-            recipient： 接收者邮箱
-            name:   自定义邮件名称
-            file:   附件路径
-        """
-        if file:
-            message = MIMEMultipart()
-            # 这里的三个参数：第一个为文本内容，第二个文本格式 plain(纯文本)/html(html代码)，第三个 utf-8 设置编码
-            message.attach(MIMEText(text, types, 'utf-8'))
-            att1 = MIMEText(open(file, 'rb').read(), 'base64', 'utf-8')
-            att1["Content-Type"] = 'application/octet-stream'
-            att1["Content-Disposition"] = f'attachment; filename="{file}"'  # 设置文件名称
-            message.attach(att1)
-        else:
-            # 这里的三个参数：第一个为文本内容，第二个文本格式 plain(纯文本)/html(html代码)，第三个 utf-8 设置编码
-            message = MIMEText(text, types, 'utf-8')
-        message['To'] = Header(recipient)  # 接收者
-        message['From'] = Header(formataddr((name, sender), "utf-8"))  # 接收者
-        message['Subject'] = Header(title, 'utf-8')  # 设置标题
-        return message
- 
-    def send(self, title: str, text: str, types: str = "plain", name: str = None, file: str = None, ):
-        """
-            title:  邮件标题
-            text:   邮件正文
-            types:  文本格式 plain(纯文本)/html(html代码)
-            name :  自定义邮件名称
-            file:   附件路径
-        """
-        try:
-            print("邮件发送中..")
-            mtpObj = smtplib.SMTP_SSL(self.serverAddress)
-            # 建立连接
-            mtpObj.connect(self.serverAddress, 587)
-            print('connected')
-            # 登录--发送者账号和口令
-            mtpObj.login(self.sender, self.password)
-            print('logged in')
-            # 设置发送信息
-            message = self.message(title, text, self.sender, self.recipient, types=types, name=name,
-                                   file=file, )
-            # 发送邮件
-            mtpObj.sendmail(self.sender, self.recipient, message.as_string())
-            print("邮件发送成功")
-            mtpObj.quit()
-        except smtplib.SMTPException:
-            print("无法发送邮件")
-
 def main():
     args = parse_args()
     args_str = ""
     for arg in vars(args):
         val = getattr(args, arg)
         args_str += f"{arg}: {val}\n"
-    p1 = sendEmail(recipient="rsy0702@163.com", sender="rsy0702@163.com", password="XYMESMLNVSYPEVZY")
-    p1.send(title=f"New experiment(cr_only) started!", text=args_str)
     writer = SummaryWriter(os.path.join(args.output_dir, "log.log"))
 
     # Initialize the accelerator. We will let the accelerator handle device placement for us in this example.
