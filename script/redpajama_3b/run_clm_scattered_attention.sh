@@ -2,7 +2,7 @@ peft=lora
 
 for ratio in $(seq 0.20 0.10 0.90)
 do
-CUDA_VISIBLE_DEVICES=0, python run_clm_local_attention.py \
+CUDA_VISIBLE_DEVICES=0, python run_clm_scattered_attention.py \
     --model_name_or_path togethercomputer/RedPajama-INCITE-Base-3B-v1 \
     --dataset_name wikitext \
     --dataset_config_name wikitext-2-raw-v1 \
@@ -12,7 +12,7 @@ CUDA_VISIBLE_DEVICES=0, python run_clm_local_attention.py \
     --num_train_epochs 3 \
     --block_size 256 \
     --preprocessing_num_workers 12 \
-    --output_dir ./output/output_${peft}_ratio${ratio}_redpajama_localattn \
+    --output_dir ./output/output_${peft}_ratio${ratio}_redpajama_scatteredattn \
     --compress \
     --bound_ratio $ratio \
     --peft $peft \

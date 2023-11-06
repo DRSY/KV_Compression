@@ -60,6 +60,7 @@ from transformers.utils import check_min_version, get_full_repo_name, send_examp
 from transformers.utils.versions import require_version
 from copy import deepcopy
 from tensorboardX import SummaryWriter
+from check import check_CausalLM, check_icl
 from datasets import set_caching_enabled
 set_caching_enabled(False)
 
@@ -276,7 +277,6 @@ def parse_args():
         assert args.output_dir is not None, "Need an `output_dir` to create a repo when `--push_to_hub` is passed."
 
     return args
-
 
 def main():
     args = parse_args()
